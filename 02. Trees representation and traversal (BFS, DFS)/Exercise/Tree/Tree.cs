@@ -107,7 +107,37 @@
 
         public IEnumerable<T> GetLongestPath()
         {
-            throw new NotImplementedException();
+            IEnumerable<T> longestPath = new HashSet<T>();
+            ICollection<Tree<T>> leaves = new HashSet<Tree<T>>();
+            Func<Tree<T>, bool> condition = t => t.children.Count == 0;
+            Dfs(this, leaves, condition);
+
+            foreach (Tree<T> l in leaves)
+            {
+                IEnumerable<T> currentPath = GetPath(l);
+
+                if (currentPath.Count() > longestPath.Count())
+                {
+                    longestPath = currentPath;
+                }
+            }
+
+            return longestPath.Reverse();
+        }
+
+        private IEnumerable<T> GetPath(Tree<T> tree)
+        {
+            HashSet<T> path = new HashSet<T>();
+            Tree<T> node = tree;
+
+            while (node != null)
+            {
+                T key = node.Key;
+                path.Add(key);
+                node = node.Parent;
+            }
+
+            return path;
         }
 
         private int GetDepth(Tree<T> node)
