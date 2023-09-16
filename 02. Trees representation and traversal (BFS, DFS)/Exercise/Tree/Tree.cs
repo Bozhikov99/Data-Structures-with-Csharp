@@ -10,6 +10,8 @@
     {
         private List<Tree<T>> children;
 
+        protected Func<Tree<T>, bool> leafCondition = t => t.children.Count == 0;
+
         public Tree(T key, params Tree<T>[] children)
         {
             Key = key;
@@ -74,8 +76,7 @@
         public IEnumerable<T> GetLeafKeys()
         {
             ICollection<Tree<T>> leaves = new HashSet<Tree<T>>();
-            Func<Tree<T>, bool> condition = t => t.children.Count == 0;
-            Dfs(this, leaves, condition);
+            Dfs(this, leaves, leafCondition);
 
             IEnumerable<T> result = leaves.Select(t => t.Key);
 
@@ -84,7 +85,6 @@
 
         public T GetDeepestKey()
         {
-            Func<Tree<T>, bool> leafCondition = t => t.children.Count == 0;
             ICollection<Tree<T>> leaves = new HashSet<Tree<T>>();
             Dfs(this, leaves, leafCondition);
 
@@ -109,8 +109,7 @@
         {
             IEnumerable<T> longestPath = new HashSet<T>();
             ICollection<Tree<T>> leaves = new HashSet<Tree<T>>();
-            Func<Tree<T>, bool> condition = t => t.children.Count == 0;
-            Dfs(this, leaves, condition);
+            Dfs(this, leaves, leafCondition);
 
             foreach (Tree<T> l in leaves)
             {
@@ -153,7 +152,7 @@
             return depth;
         }
 
-        private void Dfs(Tree<T> node, ICollection<Tree<T>> collection, Func<Tree<T>, bool> condition)
+        protected void Dfs(Tree<T> node, ICollection<Tree<T>> collection, Func<Tree<T>, bool> condition)
         {
             if (condition(node))
             {
