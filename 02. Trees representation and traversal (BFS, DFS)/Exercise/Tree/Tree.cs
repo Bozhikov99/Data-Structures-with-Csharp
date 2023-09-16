@@ -62,7 +62,7 @@
 
         public IEnumerable<T> GetInternalKeys()
         {
-            ICollection<Tree<T>> internals = new List<Tree<T>>();
+            ICollection<Tree<T>> internals = new HashSet<Tree<T>>();
             Func<Tree<T>, bool> condition = t => t.children.Count != 0 && t.Parent != null;
             Dfs(this, internals, condition);
 
@@ -84,12 +84,43 @@
 
         public T GetDeepestKey()
         {
-            throw new NotImplementedException();
+            Func<Tree<T>, bool> leafCondition = t => t.children.Count == 0;
+            ICollection<Tree<T>> leaves = new HashSet<Tree<T>>();
+            Dfs(this, leaves, leafCondition);
+
+            T deepestKey = default;
+            int maxDepth = 0;
+
+            foreach (Tree<T> node in leaves)
+            {
+                int currentDepth = GetDepth(node);
+
+                if (currentDepth > maxDepth)
+                {
+                    maxDepth = currentDepth;
+                    deepestKey = node.Key;
+                }
+            }
+
+            return deepestKey;
         }
 
         public IEnumerable<T> GetLongestPath()
         {
             throw new NotImplementedException();
+        }
+
+        private int GetDepth(Tree<T> node)
+        {
+            int depth = 0;
+
+            while (node != null)
+            {
+                depth++;
+                node = node.Parent;
+            }
+
+            return depth;
         }
 
         private void Dfs(Tree<T> node, ICollection<Tree<T>> collection, Func<Tree<T>, bool> condition)
