@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
     using System.Text;
 
     public class Tree<T> : IAbstractTree<T>
@@ -60,12 +62,24 @@
 
         public IEnumerable<T> GetInternalKeys()
         {
-            throw new NotImplementedException();
+            ICollection<Tree<T>> internals = new List<Tree<T>>();
+            Func<Tree<T>, bool> condition = t => t.children.Count != 0 && t.Parent != null;
+            Dfs(this, internals, condition);
+
+            IEnumerable<T> result = internals.Select(t => t.Key);
+
+            return result;
         }
 
         public IEnumerable<T> GetLeafKeys()
         {
-            throw new NotImplementedException();
+            ICollection<Tree<T>> leaves = new HashSet<Tree<T>>();
+            Func<Tree<T>, bool> condition = t => t.children.Count == 0;
+            Dfs(this, leaves, condition);
+
+            IEnumerable<T> result = leaves.Select(t => t.Key);
+
+            return result;
         }
 
         public T GetDeepestKey()
@@ -76,6 +90,19 @@
         public IEnumerable<T> GetLongestPath()
         {
             throw new NotImplementedException();
+        }
+
+        private void Dfs(Tree<T> node, ICollection<Tree<T>> collection, Func<Tree<T>, bool> condition)
+        {
+            if (condition(node))
+            {
+                collection.Add(node);
+            }
+
+            foreach (Tree<T> c in node.children)
+            {
+                Dfs(c, collection, condition);
+            }
         }
     }
 }
