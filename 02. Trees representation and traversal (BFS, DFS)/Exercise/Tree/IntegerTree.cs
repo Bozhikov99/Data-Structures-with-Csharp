@@ -32,7 +32,11 @@
 
         public IEnumerable<Tree<int>> GetSubtreesWithGivenSum(int sum)
         {
-            throw new NotImplementedException();
+            ICollection<Tree<int>> subtreeCollection = new List<Tree<int>>();
+
+            _ = DfsSubtreeSum(this, sum, subtreeCollection);
+
+            return subtreeCollection;
         }
 
         private IEnumerable<int> GetPath(Tree<int> node)
@@ -48,6 +52,23 @@
             }
 
             return path.Reverse();
+        }
+
+        private int DfsSubtreeSum(Tree<int> node, int sum, ICollection<Tree<int>> subtrees)
+        {
+            int currentSum = node.Key;
+
+            foreach (Tree<int> c in node.Children)
+            {
+                currentSum += DfsSubtreeSum(c, sum, subtrees);
+            }
+
+            if (currentSum == sum)
+            {
+                subtrees.Add(node);
+            }
+
+            return currentSum;
         }
     }
 }
